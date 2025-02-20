@@ -1,11 +1,19 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import prompts from "../../config/prompts"; 
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { userInput } = req.body as { userInput?: string }; 
+  const { transcription } = req.body as { transcription?: string }; 
 
-  if (!userInput) {
+  if (!transcription) {
     return res.status(400).json({ error: "Input is required" });
   }
+
+  const prompt = prompts.studentOralPresentation;
+  const messages = [
+    { role: "system", content: prompt },
+    { role: "user", content: transcription }
+  ];
+
 
   try {
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -16,7 +24,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       },
       body: JSON.stringify({
         model: "gpt-3.5-turbo", 
-        messages: [{ role: "user", content: userInput }],
+        messages,
       }),
     });
 
@@ -26,7 +34,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(500).json({ error: "No response from OpenAI" });
     }
 
-    return res.status(200).json({ message: data.choices[0].message.content });
+    return res.status(200).json({ reply: data.choices[0].message.content });
   } catch (error) {
     return res.status(500).json({ error: "Failed to fetch response" });
   }

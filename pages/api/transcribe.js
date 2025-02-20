@@ -60,7 +60,7 @@ export default async function handler(req, res) {
         },
       });
 
-      console.log("✅ OpenAI API response:", response.data);
+      console.log("✅ Whisper API response:", response.data);
       return res.status(200).json(response.data);
 
     } catch (error) {
