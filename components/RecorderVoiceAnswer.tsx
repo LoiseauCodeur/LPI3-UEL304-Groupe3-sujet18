@@ -2,7 +2,7 @@ import { useState, useRef } from "react";
 
 export default function Recorder() {
   const [isRecording, setIsRecording] = useState<boolean>(false);
-  const [transcription, setTranscription] = useState<string | null>(null);
+  const [chatHistory, setChatHistory] = useState<string>('');
   const [aiResponse, setAiResponse] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -10,7 +10,7 @@ export default function Recorder() {
 
   // Start Recording
   const startRecording = async () => {
-    setTranscription(null);
+    setChatHistory('');
     setAiResponse(null);
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     const mediaRecorder = new MediaRecorder(stream);
@@ -53,31 +53,41 @@ export default function Recorder() {
       const data = await response.json();
 
       if (response.ok && data.text) {
-        setTranscription(data.text);
-        await sendTranscriptionToAI(data.text);
+        console.log('transcription', data.text);
+        // Create updated chat history
+        const updatedChatHistory = chatHistory + "\n" + "Candidate: " + data.text;
+        setChatHistory(updatedChatHistory);
+
+        console.log('chatHistory before sending to AI:', updatedChatHistory);
+
+      // Pass updated chat history directly
+      await sendTranscriptionToAI(updatedChatHistory);
       } else {
-        setTranscription("⚠️ Failed to transcribe audio.");
+        setChatHistory((prev) => prev + "\n" + "Failed to transcribe audio");
         setIsLoading(false);
       }
     } catch (error) {
-      setTranscription("⚠️ Error processing request.");
+      setChatHistory((prev) => prev + "\n" + "Error processing request.");
       setIsLoading(false);
     }
   };
 
   // Send transcription to ChatGPT API
   const sendTranscriptionToAI = async (text: string) => {
+    console.log('sendTrToAi input' + text);
     try {
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ input: text, promptKey: 'studentOralPresentation' }),
+        body: JSON.stringify({ input: text, promptKey: 'jobInterviewSimulation' }),
       });
 
       const data = await response.json();
 
       if (response.ok && data.reply) {
+        console.log('AI response:', data.reply);
         setAiResponse(data.reply);
+        setChatHistory((prev) => prev + "\n" + "Coach: " + data.reply);
       } else {
         setAiResponse("⚠️ No response from AI.");
       }
@@ -90,7 +100,7 @@ export default function Recorder() {
 
   return (
     <div>
-      <h1 style={styles.title}>Pratiquer mon exposé oral</h1>
+      <h1 style={styles.title}>Simuler un entretien d'embauche</h1>
       <button
         onClick={isRecording ? stopRecording : startRecording}
         style={{
