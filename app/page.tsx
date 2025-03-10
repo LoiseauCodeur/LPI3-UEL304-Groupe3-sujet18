@@ -1,13 +1,12 @@
 "use client";
 
 import Recorder from "@/components/Recorder";
-import RecorderVoiceAnswer from "@/components/RecorderVoiceAnswer";
 
 export default function Home() {
   return (
     <div style={styles.container}>
-      <Recorder />
-      <RecorderVoiceAnswer />
+      <Recorder mode="single" promptKey="studentOralPresentation" />
+      <Recorder mode="conversation" maxExchanges={5} promptKey="jobInterviewSimulation" />
     </div>
   );
 
