@@ -4,42 +4,49 @@ import { sendToChatAI } from "@/composables/useChatAI";
 import { useTextToSpeech } from "@/composables/useTextToSpeech";
 
 interface RecorderProps {
+  title: string;
   mode: "single" | "conversation";
   maxExchanges?: number; 
   promptKey: string;
 }
 
-export default function Recorder({ mode, maxExchanges = 5, promptKey }: RecorderProps) {
+export default function Recorder({ title, mode, maxExchanges = 5, promptKey }: RecorderProps) {
   const [chatHistory, setChatHistory] = useState<string>("");
   const [exchangeCount, setExchangeCount] = useState<number>(0);
   const [aiResponse, setAiResponse] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   
-  const { playAIResponse } = useTextToSpeech(); // Initialize text-to-speech
+  const { playAIResponse } = useTextToSpeech();
 
-  const onTranscription = async (text: string) => {
+  const onTranscription = async (userInput: string) => {
     setIsLoading(true);
     let updatedChatHistory = chatHistory;
 
     if (mode === "conversation") {
-      updatedChatHistory += `\nCandidate: ${text}`;
+      updatedChatHistory += `\nUser: ${userInput}`;
       setChatHistory(updatedChatHistory);
     }
 
-    const reply = await sendToChatAI(updatedChatHistory || text, promptKey);
+    // Use a different promptKey for the last exchange
+    const isFinalExchange = mode === "conversation" && exchangeCount === maxExchanges - 1;
+    const finalPromptKey = isFinalExchange ? `${promptKey}_final` : promptKey;
+
+    const reply = await sendToChatAI(updatedChatHistory || userInput, finalPromptKey);
+    
     if (reply) {
       setAiResponse(reply);
-      
-      if (mode === "conversation" && exchangeCount < maxExchanges - 1) {
-        setChatHistory((prev) => prev + `\nCoach: ${reply}`);
-        await playAIResponse(reply); // Convert non-feedback responses into speech
-      } else if (mode === "conversation" && exchangeCount === maxExchanges - 1) {
-        setChatHistory(""); // Reset chat after feedback
+
+      if (mode === "conversation" && !isFinalExchange) {
+        setChatHistory((prev) => prev + `\nChatGPT: ${reply}`);
+        await playAIResponse(reply);
+      } else if (isFinalExchange) {
+        setChatHistory(""); // Reset history for new conversations
       }
-      setExchangeCount(exchangeCount + 1);
+      setExchangeCount((prev) => prev + 1);
     } else {
       setAiResponse("⚠️ No response from AI.");
     }
+
     setIsLoading(false);
   };
 
@@ -47,7 +54,7 @@ export default function Recorder({ mode, maxExchanges = 5, promptKey }: Recorder
 
   return (
     <div>
-      <h1 style={styles.title}>{mode === "single" ? "Pratiquer mon exposé oral" : "Simuler un entretien d'embauche"}</h1>
+      <h1 style={styles.title}>{title}</h1>
       <button
         onClick={isRecording ? stopRecording : startRecording}
         style={{
