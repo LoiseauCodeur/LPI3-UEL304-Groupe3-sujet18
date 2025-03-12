@@ -2,16 +2,16 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import prompts from "../../config/prompts"; 
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { transcription } = req.body as { transcription?: string }; 
+  const { input, promptKey } = req.body as { input?: string; promptKey?: string };  
 
-  if (!transcription) {
+  if (!input) {
     return res.status(400).json({ error: "Input is required" });
   }
 
-  const prompt = prompts.studentOralPresentation;
+  const prompt = promptKey && prompts[promptKey] ? prompts[promptKey] : 'generic';
   const messages = [
     { role: "system", content: prompt },
-    { role: "user", content: transcription }
+    { role: "user", content: input }
   ];
 
 

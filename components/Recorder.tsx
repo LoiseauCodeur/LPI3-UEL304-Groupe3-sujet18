@@ -1,107 +1,59 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
+import { useRecorder } from "@/composables/useRecorder";
+import { sendToChatAI } from "@/composables/useChatAI";
+import { useTextToSpeech } from "@/composables/useTextToSpeech";
 
-export default function Recorder() {
-  const [isRecording, setIsRecording] = useState<boolean>(false);
-  const [transcription, setTranscription] = useState<string | null>(null);
+interface RecorderProps {
+  title: string;
+  mode: "single" | "conversation";
+  maxExchanges?: number; 
+  promptKey: string;
+}
+
+export default function Recorder({ title, mode, maxExchanges = 5, promptKey }: RecorderProps) {
+  const [chatHistory, setChatHistory] = useState<string>("");
+  const [exchangeCount, setExchangeCount] = useState<number>(0);
   const [aiResponse, setAiResponse] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const chunksRef = useRef<Blob[]>([]);
+  
+  const { playAIResponse } = useTextToSpeech();
 
-  // Start Recording
-  const startRecording = async () => {
-    console.log("🎤 Starting recording...");
-    setTranscription(null);
-    setAiResponse(null);
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    const mediaRecorder = new MediaRecorder(stream);
+  const onTranscription = async (userInput: string) => {
+    setIsLoading(true);
+    let updatedChatHistory = chatHistory;
 
-    mediaRecorder.ondataavailable = (event: BlobEvent) => {
-      if (event.data.size > 0) {
-        chunksRef.current.push(event.data);
-      }
-    };
-
-    mediaRecorder.onstop = async () => {
-      console.log("⏹️ Stopping recording...");
-      const audioBlob = new Blob(chunksRef.current, { type: "audio/mp3" });
-      chunksRef.current = [];
-
-      console.log("📤 Sending audio to backend...");
-      setIsLoading(true);
-      await sendAudioToBackend(audioBlob);
-    };
-
-    mediaRecorderRef.current = mediaRecorder;
-    mediaRecorder.start();
-    setIsRecording(true);
-  };
-
-  // Stop Recording
-  const stopRecording = () => {
-    console.log("🛑 Stop button clicked");
-    mediaRecorderRef.current?.stop();
-    setIsRecording(false);
-  };
-
-  // Send recorded audio to backend
-  const sendAudioToBackend = async (audioBlob: Blob) => {
-    try {
-      const formData = new FormData();
-      formData.append("audio", audioBlob, "recorded-audio.mp3");
-
-      console.log("📡 Sending FormData to /api/transcribe...");
-      const response = await fetch("/api/transcribe", {
-        method: "POST",
-        body: formData,
-      });
-
-      const data = await response.json();
-      console.log("✅ Transcription received:", data);
-
-      if (response.ok && data.text) {
-        setTranscription(data.text);
-        await sendTranscriptionToAI(data.text);
-      } else {
-        setTranscription("⚠️ Failed to transcribe audio.");
-        setIsLoading(false);
-      }
-    } catch (error) {
-      console.error("❌ Error sending audio to backend:", error);
-      setTranscription("⚠️ Error processing request.");
-      setIsLoading(false);
+    if (mode === "conversation") {
+      updatedChatHistory += `\nUser: ${userInput}`;
+      setChatHistory(updatedChatHistory);
     }
-  };
 
-  // Send transcription to ChatGPT API
-  const sendTranscriptionToAI = async (text: string) => {
-    try {
-      console.log("📡 Sending transcription to /api/chat...");
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ transcription: text }),
-      });
+    const isFinalExchange = mode === "conversation" && exchangeCount === maxExchanges - 1;
+    const finalPromptKey = isFinalExchange ? `${promptKey}_final` : promptKey;
 
-      const data = await response.json();
-      console.log("💬 ChatGPT Response:", data);
+    const reply = await sendToChatAI(updatedChatHistory || userInput, finalPromptKey);
+    
+    if (reply) {
+      setAiResponse(reply);
 
-      if (response.ok && data.reply) {
-        setAiResponse(data.reply);
-      } else {
-        setAiResponse("⚠️ No response from AI.");
+      if (mode === "conversation" && !isFinalExchange) {
+        setChatHistory((prev) => prev + `\nChatGPT: ${reply}`);
+        await playAIResponse(reply);
+      } else if (isFinalExchange) {
+        setChatHistory("");
       }
-    } catch (error) {
-      console.error("❌ Error sending transcription to AI:", error);
-      setAiResponse("⚠️ Error processing AI request.");
-    } finally {
-      setIsLoading(false);
+      setExchangeCount((prev) => prev + 1);
+    } else {
+      setAiResponse("No response from AI.");
     }
+
+    setIsLoading(false);
   };
+
+  const { isRecording, startRecording, stopRecording } = useRecorder(onTranscription);
 
   return (
-    <div style={styles.container}>
-      <h1 style={styles.title}>Pratiquer mon exposé oral</h1>
+    <div>
+      <h1 style={styles.title}>{title}</h1>
       <button
         onClick={isRecording ? stopRecording : startRecording}
         style={{
@@ -119,16 +71,6 @@ export default function Recorder() {
 
 // Styles
 const styles = {
-  container: {
-    display: "flex",
-    flexDirection: "column" as const,
-    alignItems: "center",
-    justifyContent: "center",
-    height: "100vh",
-    fontFamily: "Arial, sans-serif",
-    backgroundColor: "#f8f9fa",
-    textAlign: "center" as const,
-  },
   title: {
     fontSize: "24px",
     fontWeight: "bold",
@@ -147,13 +89,6 @@ const styles = {
     marginTop: "15px",
     fontSize: "14px",
     color: "#6c757d",
-  },
-  transcription: {
-    marginTop: "20px",
-    fontSize: "16px",
-    fontWeight: "bold",
-    color: "#343a40",
-    maxWidth: "80%",
   },
   aiResponse: {
     marginTop: "15px",
