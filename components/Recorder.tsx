@@ -27,7 +27,6 @@ export default function Recorder({ title, mode, maxExchanges = 5, promptKey }: R
       setChatHistory(updatedChatHistory);
     }
 
-    // Use a different promptKey for the last exchange
     const isFinalExchange = mode === "conversation" && exchangeCount === maxExchanges - 1;
     const finalPromptKey = isFinalExchange ? `${promptKey}_final` : promptKey;
 
@@ -40,11 +39,11 @@ export default function Recorder({ title, mode, maxExchanges = 5, promptKey }: R
         setChatHistory((prev) => prev + `\nChatGPT: ${reply}`);
         await playAIResponse(reply);
       } else if (isFinalExchange) {
-        setChatHistory(""); // Reset history for new conversations
+        setChatHistory("");
       }
       setExchangeCount((prev) => prev + 1);
     } else {
-      setAiResponse("⚠️ No response from AI.");
+      setAiResponse("No response from AI.");
     }
 
     setIsLoading(false);
