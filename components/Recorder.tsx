@@ -4,18 +4,17 @@ import { sendToChatAI } from "@/composables/useChatAI";
 import { useTextToSpeech } from "@/composables/useTextToSpeech";
 
 interface RecorderProps {
-  title: string;
   mode: "single" | "conversation";
-  maxExchanges?: number; 
+  maxExchanges?: number;
   promptKey: string;
 }
 
-export default function Recorder({ title, mode, maxExchanges = 5, promptKey }: RecorderProps) {
+export default function Recorder({ mode, maxExchanges = 5, promptKey }: RecorderProps) {
   const [chatHistory, setChatHistory] = useState<string>("");
   const [exchangeCount, setExchangeCount] = useState<number>(0);
   const [aiResponse, setAiResponse] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  
+
   const { playAIResponse } = useTextToSpeech();
 
   const onTranscription = async (userInput: string) => {
@@ -31,7 +30,7 @@ export default function Recorder({ title, mode, maxExchanges = 5, promptKey }: R
     const finalPromptKey = isFinalExchange ? `${promptKey}_final` : promptKey;
 
     const reply = await sendToChatAI(updatedChatHistory || userInput, finalPromptKey);
-    
+
     if (reply) {
       setAiResponse(reply);
 
@@ -52,49 +51,18 @@ export default function Recorder({ title, mode, maxExchanges = 5, promptKey }: R
   const { isRecording, startRecording, stopRecording } = useRecorder(onTranscription);
 
   return (
-    <div>
-      <h1 style={styles.title}>{title}</h1>
+    <div className="flex flex-col items-center justify-center p-6">
       <button
         onClick={isRecording ? stopRecording : startRecording}
-        style={{
-          ...styles.button,
-          backgroundColor: isRecording ? "#d9534f" : "#0275d8",
-        }}
+        className={`px-5 py-3 text-white text-lg rounded transition duration-300 ${
+          isRecording ? "bg-red-500 hover:bg-red-600" : "bg-blue-600 hover:bg-blue-700"
+        }`}
       >
         {isRecording ? "Arrêter l'enregistrement" : "Commencer l'enregistrement"}
       </button>
-      {isLoading && <p style={styles.loading}>⏳ Traitement en cours...</p>}
-      {aiResponse && <p style={styles.aiResponse}>{aiResponse}</p>}
+
+      {isLoading && <p className="mt-4 text-gray-600 text-sm">⏳ Traitement en cours...</p>}
+      {aiResponse && <p className="mt-4 text-teal-600 text-lg italic max-w-4xl text-center">{aiResponse}</p>}
     </div>
   );
 }
-
-// Styles
-const styles = {
-  title: {
-    fontSize: "24px",
-    fontWeight: "bold",
-    marginBottom: "20px",
-  },
-  button: {
-    fontSize: "16px",
-    padding: "12px 20px",
-    borderRadius: "5px",
-    color: "#fff",
-    border: "none",
-    cursor: "pointer",
-    transition: "background-color 0.3s",
-  },
-  loading: {
-    marginTop: "15px",
-    fontSize: "14px",
-    color: "#6c757d",
-  },
-  aiResponse: {
-    marginTop: "15px",
-    fontSize: "16px",
-    fontStyle: "italic",
-    color: "#17a2b8",
-    maxWidth: "80%",
-  },
-};

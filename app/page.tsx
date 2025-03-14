@@ -1,30 +1,31 @@
 "use client";
 
-import Recorder from "@/components/Recorder";
+import Link from "next/link";
 
 export default function Home() {
+  const recorderModes = [
+    { mode: "single", title: "Pratiquer un exposé oral", key: "studentOralPresentation" },
+    { mode: "conversation", title: "Simuler un entretien d'embauche", key: "jobInterview" },
+    { mode: "conversation", title: "Simuler une réunion professionnelle", key: "meetingPresentation" },
+    { mode: "single", title: "Obtenir le résumé d'un discours", key: "oralSessionSummary" },
+    { mode: "single", title: "Améliorer son expression", key: "reformulation" },
+    { mode: "single", title: "Générer un script de discours", key: "speechScriptGeneration" },
+  ];
+
   return (
-    <div style={styles.container}>
-      <Recorder mode="single" title="Pratiquer un exposé oral" promptKey="studentOralPresentation" />
-      <Recorder mode="conversation" title="Simuler un entretien d'embauche" maxExchanges={5} promptKey="jobInterview" />
-      <Recorder mode="conversation" title="Simuler une réunion professionnelle" maxExchanges={5} promptKey="meetingPresentation" />
-      <Recorder mode="single" title="Obtenir le résumé d'un discours" promptKey="oralSessionSummary" />
-      <Recorder mode="single" title="Améliorer son expression" promptKey="reformulation" />
-      <Recorder mode="single" title="Générer un script de discours" promptKey="speechScriptGeneration" />
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 text-center">
+      <h1 className="text-2xl font-bold mb-6">Choisissez une activité :</h1>
+      <div className="space-y-4">
+        {recorderModes.map(({ mode, title, key }) => (
+          <Link 
+            key={key} 
+            href={`/activity/${key}`} 
+            className="text-blue-600 hover:underline block"
+          >
+            {title}
+          </Link>
+        ))}
+      </div>
     </div>
   );
-
 }
-
-const styles = {
-  container: {
-    display: "flex",
-    flexDirection: "column" as const,
-    alignItems: "center",
-    justifyContent: "center",
-    height: "100vh",
-    fontFamily: "Arial, sans-serif",
-    backgroundColor: "#f8f9fa",
-    textAlign: "center" as const,
-  }
-};
