@@ -51,18 +51,23 @@ export default function Recorder({ mode, maxExchanges = 5, promptKey }: Recorder
   const { isRecording, startRecording, stopRecording } = useRecorder(onTranscription);
 
   return (
-    <div className="flex flex-col items-center justify-center p-6">
+    <div className="flex flex-col items-center justify-center p-6 w-full max-w-lg">
       <button
         onClick={isRecording ? stopRecording : startRecording}
-        className={`px-5 py-3 text-white text-lg rounded transition duration-300 ${
-          isRecording ? "bg-red-500 hover:bg-red-600" : "bg-blue-600 hover:bg-blue-700"
+        className={`px-5 py-3 text-[#c0bb39] font-semibold rounded-lg transition duration-300 focus:outline-none focus:ring-2 focus:ring-[#c0bb39]/50 ${
+          isRecording ? "bg-[#6d1717] hover:bg-[#580f0f]" : "bg-[#6d1717] hover:bg-[#580f0f]"
         }`}
       >
-        {isRecording ? "Arrêter l'enregistrement" : "Commencer l'enregistrement"}
+        {isRecording ? "⏹️ Arrêter l'enregistrement" : "🎤 Commencer l'enregistrement"}
       </button>
 
-      {isLoading && <p className="mt-4 text-gray-600 text-sm">⏳ Traitement en cours...</p>}
-      {aiResponse && <p className="mt-4 text-teal-600 text-lg italic max-w-4xl text-center">{aiResponse}</p>}
+      {isLoading && <p className="mt-4 text-[#c0bb39] text-sm">⏳ Traitement en cours...</p>}
+
+      {aiResponse && (
+        <div className="mt-4 bg-[#1a1a1a] border border-[#c0bb39]/30 text-[#c0bb39] text-lg italic p-4 rounded-lg shadow-lg max-w-full text-center">
+          {aiResponse}
+        </div>
+      )}
     </div>
   );
 }

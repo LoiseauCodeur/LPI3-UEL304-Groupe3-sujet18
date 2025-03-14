@@ -2,6 +2,7 @@
 
 import { useParams } from "next/navigation";
 import Recorder from "@/components/Recorder";
+import Link from "next/link";
 
 const recorderConfigs: Record<string, { mode: "single" | "conversation"; title: string; maxExchanges?: number }> = {
   studentOralPresentation: { mode: "single", title: "Pratiquer un exposé oral" },
@@ -25,10 +26,20 @@ export default function RecorderPage() {
   const { title, mode: recorderMode, maxExchanges } = recorderConfigs[mode];
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-white">
-      <a href="/" className="mt-6 text-blue-500 hover:underline">Retour à l'accueil</a>
-      <h1 className="text-2xl font-bold mb-4">{title}</h1>
-      <Recorder mode={recorderMode} promptKey={mode} maxExchanges={maxExchanges} />
+<div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-[#232323] to-[#333232] p-6">
+      <div className="bg-[#1a1a1a] shadow-lg rounded-2xl p-8 max-w-lg w-full text-center border border-[#c0bb39]/30">
+        
+        <h1 className="text-3xl font-extrabold text-[#c0bb39] mb-6">{title}</h1>
+
+        <Recorder mode={recorderMode} promptKey={mode} maxExchanges={maxExchanges} />
+
+        <Link 
+          href="/" 
+          className="inline-block mt-6 bg-[#6d1717] text-[#c0bb39] font-semibold py-2 px-4 rounded-lg transition duration-300 ease-in-out transform hover:bg-[#580f0f] hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#c0bb39]/50"
+        >
+          Retour à l'accueil
+        </Link>
+      </div>
     </div>
   );
 }
