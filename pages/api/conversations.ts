@@ -1,10 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { connectToDatabase } from "../../lib/mongodb";
-import Conversation, { IConversation } from "../../models/Conversation";
+import Conversation from "../../models/Conversation";
+import mongoose from "mongoose";
 
 interface ApiResponse {
   success: boolean;
-  data?: IConversation | IConversation[];
+  data?: any;
   error?: string;
 }
 
@@ -24,8 +25,38 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
 
   if (req.method === "GET") {
     try {
-      const conversations = await Conversation.find().sort({ createdAt: -1 });
-      return res.status(200).json({ success: true, data: conversations });
+      if (req.query.id) {
+        const { id } = req.query;
+        if (!mongoose.Types.ObjectId.isValid(id as string)) {
+          return res.status(400).json({ success: false, error: "Invalid conversation ID" });
+        }
+        const conversation = await Conversation.findById(id);
+        if (!conversation) {
+          return res.status(404).json({ success: false, error: "Conversation not found" });
+        }
+        return res.status(200).json({ success: true, data: conversation });
+      } else {
+        const conversations = await Conversation.find().sort({ createdAt: -1 });
+        return res.status(200).json({ success: true, data: conversations });
+      }
+    } catch (error: any) {
+      return res.status(400).json({ success: false, error: error.message });
+    }
+  }
+
+  if (req.method === "DELETE") {
+    try {
+      const { id } = req.query;
+      if (!id || !mongoose.Types.ObjectId.isValid(id as string)) {
+        return res.status(400).json({ success: false, error: "Invalid conversation ID" });
+      }
+
+      const deletedConversation = await Conversation.findByIdAndDelete(id);
+      if (!deletedConversation) {
+        return res.status(404).json({ success: false, error: "Conversation not found" });
+      }
+
+      return res.status(200).json({ success: true, data: deletedConversation });
     } catch (error: any) {
       return res.status(400).json({ success: false, error: error.message });
     }

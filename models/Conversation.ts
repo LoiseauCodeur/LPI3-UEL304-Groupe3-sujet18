@@ -1,6 +1,6 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
 
-export interface IConversation extends Document {
+interface IConversation extends Document {
   title: string;
   text: string;
   finalResponse: string;

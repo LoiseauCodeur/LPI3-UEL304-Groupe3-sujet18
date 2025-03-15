@@ -9,14 +9,16 @@ interface RecorderProps {
   mode: "single" | "conversation";
   maxExchanges?: number;
   promptKey: string;
+  refreshHistory: () => void;
 }
 
-export default function Recorder({ mode, maxExchanges = 5, promptKey }: RecorderProps) {
+export default function Recorder({ mode, maxExchanges = 5, promptKey, refreshHistory }: RecorderProps) {
   const [chatHistory, setChatHistory] = useState<string>("");
   const [exchangeCount, setExchangeCount] = useState<number>(0);
   const [aiResponse, setAiResponse] = useState<string | null>(null);
   const [jsonResponse, setJsonResponse] = useState<Record<string, any> | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isFinalResponseShown, setIsFinalResponseShown] = useState<boolean>(false);
 
   const { playAIResponse } = useTextToSpeech();
   const { addConversation } = useConversations();
@@ -41,6 +43,7 @@ export default function Recorder({ mode, maxExchanges = 5, promptKey }: Recorder
         if (typeof parsedReply === "object" && parsedReply !== null) {
           setJsonResponse(parsedReply);
           setAiResponse(null);
+          setIsFinalResponseShown(true);
 
           const title: string = parsedReply.titre || "Conversation sans titre";
           const finalResponse: string = reply;
@@ -87,21 +90,41 @@ export default function Recorder({ mode, maxExchanges = 5, promptKey }: Recorder
     setIsLoading(false);
   };
 
+  const handleNewExchange = async () => {
+    setJsonResponse(null);
+    setAiResponse(null);
+    setIsFinalResponseShown(false);
+    setChatHistory("");
+    setExchangeCount(0);
+  
+    await refreshHistory(); // Fetch updated conversation history
+  };
+  
+
   const { isRecording, startRecording, stopRecording } = useRecorder(onTranscription);
 
   return (
     <div className="flex flex-col items-center justify-center p-6">
-      <button
-        onClick={isRecording ? stopRecording : startRecording}
-        className={`px-5 py-3 text-white text-lg rounded transition duration-300 ${
-          isRecording ? "bg-red-500 hover:bg-red-600" : "bg-blue-600 hover:bg-blue-700"
-        }`}
-      >
-        {isRecording ? "Arrêter l'enregistrement" : "Commencer l'enregistrement"}
-      </button>
+      {isFinalResponseShown ? (
+        <button
+          onClick={handleNewExchange}
+          className="px-5 py-3 text-white text-lg rounded transition duration-300 bg-green-600 hover:bg-green-700"
+        >
+          Un nouvel échange
+        </button>
+      ) : (
+        <button
+          onClick={isRecording ? stopRecording : startRecording}
+          className={`px-5 py-3 text-white text-lg rounded transition duration-300 ${
+            isRecording ? "bg-red-500 hover:bg-red-600" : "bg-blue-600 hover:bg-blue-700"
+          }`}
+        >
+          {isRecording ? "Arrêter l'enregistrement" : "Commencer l'enregistrement"}
+        </button>
+      )}
 
       {isLoading && <p className="mt-4 text-gray-600 text-sm">⏳ Traitement en cours...</p>}
-      {jsonResponse && <ChatDisplay response={JSON.stringify(jsonResponse)} />}
+      {jsonResponse && <ChatDisplay response={jsonResponse} />}
       {aiResponse && !jsonResponse && (
         <p className="mt-4 text-teal-600 text-lg italic max-w-4xl text-center">{aiResponse}</p>
       )}
