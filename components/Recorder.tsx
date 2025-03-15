@@ -97,7 +97,7 @@ export default function Recorder({ mode, maxExchanges = 5, promptKey, refreshHis
     setChatHistory("");
     setExchangeCount(0);
   
-    await refreshHistory(); // Fetch updated conversation history
+    await refreshHistory();
   };
   
 
@@ -110,7 +110,7 @@ export default function Recorder({ mode, maxExchanges = 5, promptKey, refreshHis
           onClick={handleNewExchange}
           className="px-5 py-3 text-white text-lg rounded transition duration-300 bg-green-600 hover:bg-green-700"
         >
-          Un nouvel échange
+          Nouvel échange
         </button>
       ) : (
         <button
