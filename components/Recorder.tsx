@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useRecorder } from "@/composables/useRecorder";
 import { sendToChatAI } from "@/composables/useChatAI";
 import { useTextToSpeech } from "@/composables/useTextToSpeech";
+import { useConversations, ConversationInput } from "@/composables/useConversations";
 import ChatDisplay from "@/components/ChatDisplay";
 
 interface RecorderProps {
@@ -14,17 +15,18 @@ export default function Recorder({ mode, maxExchanges = 5, promptKey }: Recorder
   const [chatHistory, setChatHistory] = useState<string>("");
   const [exchangeCount, setExchangeCount] = useState<number>(0);
   const [aiResponse, setAiResponse] = useState<string | null>(null);
-  const [jsonResponse, setJsonResponse] = useState<string | null>(null);
+  const [jsonResponse, setJsonResponse] = useState<Record<string, any> | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const { playAIResponse } = useTextToSpeech();
+  const { addConversation } = useConversations();
 
   const onTranscription = async (userInput: string) => {
     setIsLoading(true);
     let updatedChatHistory = chatHistory;
 
     if (mode === "conversation") {
-      updatedChatHistory += `\nUser: ${userInput}`;
+      updatedChatHistory += `\nVous: ${userInput}`;
       setChatHistory(updatedChatHistory);
     }
 
@@ -34,12 +36,38 @@ export default function Recorder({ mode, maxExchanges = 5, promptKey }: Recorder
     const reply = await sendToChatAI(updatedChatHistory || userInput, finalPromptKey);
 
     if (reply) {
-      let parsedReply;
       try {
-        parsedReply = JSON.parse(reply);
+        const parsedReply = JSON.parse(reply);
         if (typeof parsedReply === "object" && parsedReply !== null) {
-          setJsonResponse(reply);
+          setJsonResponse(parsedReply);
           setAiResponse(null);
+
+          const title: string = parsedReply.titre || "Conversation sans titre";
+          const finalResponse: string = reply;
+
+          let score: number | null = null;
+          if (typeof parsedReply.score === "string") {
+            const extractedScore = parseInt(parsedReply.score.split("/")[0], 10);
+            if (!isNaN(extractedScore)) {
+              score = extractedScore;
+            }
+          }
+
+          let text = mode === "single" ? userInput : updatedChatHistory;
+          if (isFinalExchange) {
+            text = chatHistory;
+            setChatHistory("");
+          }
+
+          const newConversation: ConversationInput = {
+            title,
+            text,
+            finalResponse,
+            score,
+            scenario: promptKey,
+          };
+
+          await addConversation(newConversation);
         }
       } catch {
         setJsonResponse(null);
@@ -47,19 +75,8 @@ export default function Recorder({ mode, maxExchanges = 5, promptKey }: Recorder
       }
 
       if (mode === "conversation" && !isFinalExchange) {
-        setChatHistory((prev) => prev + `\nChatGPT: ${reply}`);
+        setChatHistory((prev) => prev + `\nIA: ${reply}`);
         await playAIResponse(reply);
-      } 
-
-      if (isFinalExchange) {
-        console.log("Final exchange reached! Logging conversation.");
-        setChatHistory("");
-        logFinalConversation(userInput, updatedChatHistory, reply);
-      }
-
-      if (mode === "single") {
-        console.log("Single mode: Logging user input and AI response.");
-        logFinalConversation(userInput, "", reply);
       }
 
       setExchangeCount((prev) => prev + 1);
@@ -68,30 +85,6 @@ export default function Recorder({ mode, maxExchanges = 5, promptKey }: Recorder
     }
 
     setIsLoading(false);
-  };
-
-  const logFinalConversation = (userInput: string, conversation: string, feedback: string) => {
-    console.log("logFinalConversation was called");
-
-    let score: number | null = null;
-    try {
-      const parsedFeedback = JSON.parse(feedback);
-      if ("score" in parsedFeedback) {
-        const scoreString = parsedFeedback["score"];
-        const match = scoreString.match(/^(\d+)\/10$/);
-        if (match) {
-          score = parseInt(match[1], 10);
-        }
-      }
-    } catch {
-      console.error("Error parsing feedback JSON:", feedback);
-    }
-
-    const logData = mode === "single"
-      ? { userInput, feedback, score }
-      : { conversation, feedback, score };
-
-    console.log("Final Conversation Log:", logData);
   };
 
   const { isRecording, startRecording, stopRecording } = useRecorder(onTranscription);
@@ -108,7 +101,7 @@ export default function Recorder({ mode, maxExchanges = 5, promptKey }: Recorder
       </button>
 
       {isLoading && <p className="mt-4 text-gray-600 text-sm">⏳ Traitement en cours...</p>}
-      {jsonResponse && <ChatDisplay response={jsonResponse} />}
+      {jsonResponse && <ChatDisplay response={JSON.stringify(jsonResponse)} />}
       {aiResponse && !jsonResponse && (
         <p className="mt-4 text-teal-600 text-lg italic max-w-4xl text-center">{aiResponse}</p>
       )}
