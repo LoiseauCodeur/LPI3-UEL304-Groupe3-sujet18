@@ -12,7 +12,7 @@ export default function Home() {
 
   useEffect(() => {
     if (status !== "loading" && !session) {
-      router.push("/login"); 
+      router.push("/login");
     }
   }, [session, status, router]);
 
@@ -21,35 +21,45 @@ export default function Home() {
   }
 
   const recorderModes = [
-    { mode: "single", title: "Pratiquer un exposé oral", key: "studentOralPresentation" },
-    { mode: "conversation", title: "Simuler un entretien d'embauche", key: "jobInterview" },
-    { mode: "conversation", title: "Simuler une réunion professionnelle", key: "meetingPresentation" },
-    { mode: "single", title: "Obtenir le résumé d'un discours", key: "oralSessionSummary" },
-    { mode: "single", title: "Améliorer son expression", key: "reformulation" },
-    { mode: "single", title: "Générer un script de discours", key: "speechScriptGeneration" },
+    { mode: "single", title: "Pratiquer un exposé oral", key: "studentOralPresentation", icon: "/speaker.png" },
+    { mode: "conversation", title: "Simuler un entretien d'embauche", key: "jobInterview", icon: "/job-interview.png" },
+    { mode: "conversation", title: "Simuler une réunion professionnelle", key: "meetingPresentation", icon: "/corporate-discussions.png" },
+    { mode: "single", title: "Obtenir le résumé d'un discours", key: "oralSessionSummary", icon: "/summary.png" },
+    { mode: "single", title: "Améliorer son expression", key: "reformulation", icon: "/improvement.png" },
+    { mode: "single", title: "Générer un script de discours", key: "speechScriptGeneration", icon: "/script.png" },
   ];
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-[#232323] to-[#333232] p-6">
-      <Image
-        src="/logo.png"
-        alt="Logo de Social AI Academy"
-        width={120}
-        height={120}
-        className="mb-6"
-        priority
-      />
-
-      <div className="bg-[#1a1a1a] shadow-lg rounded-2xl p-8 max-w-md w-full text-center border border-[#c0bb39]/30">
-        <h1 className="text-3xl font-extrabold text-[#c0bb39] mb-6">Choisissez une activité</h1>
-        <div className="grid gap-4">
-          {recorderModes.map(({ title, key }) => (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-[#0A0F1A] to-[#1C1C2A] p-6">
+      <div className="rounded-2xl max-w-3xl w-full text-center">
+        <h1 className="top-25 text-center text-3xl font-extrabold text-white">Choisissez une activité</h1>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols- gap-6">
+          {recorderModes.map(({ title, key, icon }) => (
             <Link
               key={key}
               href={`/activity/${key}`}
-              className="block bg-[#6d1717] text-[#c0bb39] font-semibold py-3 px-6 rounded-lg transition duration-300 ease-in-out transform hover:bg-[#580f0f] hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#c0bb39]/50"
+              className="group relative block w-full h-64"
             >
-              {title}
+              <div className="card perspective-800px w-full h-full bg-opacity-70 hover:bg-opacity-80 transition-all duration-300">
+                <div className="card__content w-full h-full transition-transform duration-1000 ease-in-out transform-style-preserve-3d">
+                  <div className="card__front absolute top-0 bottom-0 right-0 left-0 p-8 bg-opacity-60 bg-[#1A1A2E] text-white flex items-center justify-center rounded-xl shadow-lg">
+                    <div className="p-12 text-black inset-0 flex items-center justify-center">
+                      <img
+                        src={icon}
+                        alt={title}
+                        className="icon w-full h-full object-contain filter brightness-0" 
+                      />
+                    </div>
+                  </div>
+
+                  <div className="card__back absolute top-0 bottom-0 right-0 left-0 p-8 bg-opacity-60 bg-[#1A1A2E] text-white flex items-center justify-center rounded-xl shadow-lg transform-rotateY-180">
+                    <div className="flex flex-col items-center">
+                      <span className="text-2xl font-bold">{title}</span>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
             </Link>
           ))}
         </div>

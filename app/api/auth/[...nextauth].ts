@@ -17,18 +17,30 @@ export const authOptions = {
           if (!credentials || !credentials.email || !credentials.password) {
             throw new Error("Les identifiants sont requis");
           }
-  
+        
+          console.log("Tentative de connexion pour l'email : ", credentials.email);
+        
           const client = await connectToDatabase();
           const db = client.db(process.env.MONGODB_DB);
+        
           const user = await db.collection("users").findOne({ email: credentials.email });
-  
-          if (!user) throw new Error("Utilisateur non trouvé");
-  
+        
+          if (!user) {
+            console.log("Utilisateur non trouvé");
+            return null;
+          }
+        
           const isValid = await compare(credentials.password, user.password);
-          if (!isValid) throw new Error("Mot de passe incorrect");
-  
+          if (!isValid) {
+            console.log("Mot de passe incorrect");
+            return null;
+          }
+        
+          console.log("Utilisateur authentifié :", user);
           return { id: user._id.toString(), email: user.email };
-        },
+        }
+        
+        
       }),
     ],
     pages: {
