@@ -19,7 +19,24 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
-.ant-message {
-  z-index: 9999 !important;
+
+.card {
+  perspective: 800px;
+}
+.card__content {
+  transform-style: preserve-3d;
+}
+.card:hover .card__content {
+  transform: rotateY(180deg);
+}
+.card__front,
+.card__back {
+  backface-visibility: hidden;
+}
+.card__back {
+  transform: rotateY(180deg);
 }
 
+.icon {
+  filter: grayscale(100%) contrast(100%) brightness(0) !important;
+}

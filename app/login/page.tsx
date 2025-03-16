@@ -11,12 +11,11 @@ const { Text } = Typography;
 const Login = () => {
   const router = useRouter(); 
   const [loading, setLoading] = useState(false);
-  const [csrf, setCsrf] = useState<string | null>(null); // Définir le type du csrf
+  const [csrf, setCsrf] = useState<string | null>(null); 
 
   useEffect(() => {
     const fetchCsrf = async () => {
-      const token = await getCsrfToken(); // Récupère le csrfToken
-      // Vérifiez si le token est défini, sinon assignez null
+      const token = await getCsrfToken(); 
       setCsrf(token || null);
     };
 
@@ -29,14 +28,14 @@ const Login = () => {
     const res = await signIn("credentials", {
       email: values.email,
       password: values.password,
-      csrfToken: csrf, // Le csrfToken peut être null ou string
+      csrfToken: csrf, 
       redirect: false,
     });
 
     if (res?.ok) {
       const session = await fetch("/api/auth/session").then(res => res.json());
       console.log("Session :", session);
-      router.push("/dashboard");
+      router.push("/");
     }
 
     setLoading(false);

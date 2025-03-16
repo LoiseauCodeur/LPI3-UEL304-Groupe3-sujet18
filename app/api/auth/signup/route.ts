@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 export async function POST(req: Request) {
   try {
     const client = await connectToDatabase();
-    const db = client.db("304");
+    const db = client.db(process.env.MONGODB_DB);
     const usersCollection = db.collection("users");
 
     const { username, email, password } = await req.json();

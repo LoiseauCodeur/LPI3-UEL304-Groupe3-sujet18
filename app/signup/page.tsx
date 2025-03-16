@@ -41,7 +41,7 @@ const Signup = () => {
         console.log("🚨 Erreur API détectée:", data);
 
         if ("error" in data) {
-          toast.error(data.error);  
+          toast.error(data.error || "Une erreur inconnue est survenue.");
         } else {
           console.log("🔴 Affichage message d'erreur générique");
           toast.error("Une erreur est survenue !");
