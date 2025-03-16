@@ -84,7 +84,7 @@ export default function Recorder({ mode, maxExchanges = 5, promptKey, refreshHis
 
       setExchangeCount((prev) => prev + 1);
     } else {
-      setAiResponse("No response from AI.");
+      setAiResponse("⚠️ Aucune réponse de l'IA.");
     }
 
     setIsLoading(false);
@@ -96,38 +96,43 @@ export default function Recorder({ mode, maxExchanges = 5, promptKey, refreshHis
     setIsFinalResponseShown(false);
     setChatHistory("");
     setExchangeCount(0);
-  
     await refreshHistory();
   };
-  
 
   const { isRecording, startRecording, stopRecording } = useRecorder(onTranscription);
 
   return (
-    <div className="flex flex-col items-center justify-center p-6">
+    <div className="flex flex-col items-center justify-center p-6 text-[#c0bb39]">
+      {/* Bouton d'interaction */}
       {isFinalResponseShown ? (
         <button
           onClick={handleNewExchange}
-          className="px-5 py-3 text-white text-lg rounded transition duration-300 bg-green-600 hover:bg-green-700"
+          className="px-6 py-3 text-lg font-bold rounded-lg transition duration-300 bg-[#3b6e22] text-white hover:bg-[#2e5819] shadow-lg"
         >
-          Nouvel échange
+          🔄 Nouvel échange
         </button>
       ) : (
         <button
           onClick={isRecording ? stopRecording : startRecording}
-          className={`px-5 py-3 text-white text-lg rounded transition duration-300 ${
-            isRecording ? "bg-red-500 hover:bg-red-600" : "bg-blue-600 hover:bg-blue-700"
+          className={`px-6 py-3 text-lg font-bold rounded-lg transition duration-300 shadow-lg ${
+            isRecording
+              ? "bg-[#6d1717] text-white hover:bg-[#580f0f]"
+              : "bg-[#c0bb39] text-black hover:bg-[#d4d054]"
           }`}
         >
-          {isRecording ? "Arrêter l'enregistrement" : "Commencer l'enregistrement"}
+          {isRecording ? "⏹️ Arrêter l'enregistrement" : "🎤 Commencer l'enregistrement"}
         </button>
       )}
 
-      {isLoading && <p className="mt-4 text-gray-600 text-sm">⏳ Traitement en cours...</p>}
+      {/* Message de chargement */}
+      {isLoading && <p className="mt-4 text-[#c0bb39] text-sm italic animate-pulse">⏳ Traitement en cours...</p>}
+
+      {/* Affichage des réponses */}
       {jsonResponse && <ChatDisplay response={jsonResponse} />}
       {aiResponse && !jsonResponse && (
-        <p className="mt-4 text-teal-600 text-lg italic max-w-4xl text-center">{aiResponse}</p>
+        <p className="mt-4 text-lg italic max-w-4xl text-center text-[#c0bb39]/80">{aiResponse}</p>
       )}
     </div>
   );
 }
+

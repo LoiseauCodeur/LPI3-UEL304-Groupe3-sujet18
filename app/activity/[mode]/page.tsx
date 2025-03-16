@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import Recorder from "@/components/Recorder";
 import { useConversations, Conversation } from "@/composables/useConversations";
 import ConversationModal from "@/components/ConversationModal";
+import Link from "next/link";
 
 const recorderConfigs: Record<string, { mode: "single" | "conversation"; title: string; maxExchanges?: number }> = {
   studentOralPresentation: { mode: "single", title: "Pratiquer un exposé oral" },
@@ -23,7 +24,7 @@ export default function RecorderPage() {
   const [filteredConversations, setFilteredConversations] = useState<Conversation[]>([]);
   const [isFetching, setIsFetching] = useState(true);
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
-  
+
   useEffect(() => {
     if (mode) {
       setIsFetching(true);
@@ -44,36 +45,43 @@ export default function RecorderPage() {
   const { title, mode: recorderMode, maxExchanges } = recorderConfigs[mode];
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-white p-6">
-      <a href="/" className="mt-6 text-blue-500 hover:underline">Retour à l'accueil</a>
-      <h1 className="text-2xl font-bold mb-4">{title}</h1>
-      <Recorder mode={recorderMode} promptKey={mode} maxExchanges={maxExchanges} refreshHistory={fetchConversations}  />
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-[#232323] to-[#333232] p-6 text-[#c0bb39]">
+      {/* Lien de retour */}
+      <Link href="/" className="mb-6 text-[#c0bb39] hover:underline hover:text-[#d4d054] transition">
+        ← Retour à l'accueil
+      </Link>
+
+      {/* Titre */}
+      <h1 className="text-3xl font-extrabold mb-6">{title}</h1>
+
+      {/* Enregistreur */}
+      <Recorder mode={recorderMode} promptKey={mode} maxExchanges={maxExchanges} refreshHistory={fetchConversations} />
 
       {/* Historique */}
-      <div className="mt-8 w-full max-w-lg">
-        <h2 className="text-xl font-semibold mb-4">Historique</h2>
+      <div className="mt-8 w-full max-w-lg bg-[#1a1a1a] p-6 rounded-lg shadow-lg border border-[#c0bb39]/30">
+        <h2 className="text-xl font-semibold mb-4 text-[#c0bb39]">Historique</h2>
 
         {isFetching ? (
-          <p className="text-gray-500 text-center">Chargement...</p>
+          <p className="text-[#c0bb39] text-center">⏳ Chargement...</p>
         ) : filteredConversations.length > 0 ? (
-          <table className="w-full border-collapse border border-gray-300 bg-gray-100 rounded-md">
+          <table className="w-full border-collapse border border-[#c0bb39]/50">
             <thead>
-              <tr className="bg-gray-200">
-                <th className="border border-gray-300 px-4 py-2 text-left">Titre</th>
-                <th className="border border-gray-300 px-4 py-2 text-left">Date</th>
-                <th className="border border-gray-300 px-4 py-2">Actions</th>
+              <tr className="bg-[#2a2a2a] text-[#c0bb39]">
+                <th className="border border-[#c0bb39]/50 px-4 py-2 text-left">Titre</th>
+                <th className="border border-[#c0bb39]/50 px-4 py-2 text-left">Date</th>
+                <th className="border border-[#c0bb39]/50 px-4 py-2 text-center">Actions</th>
               </tr>
             </thead>
             <tbody>
               {filteredConversations.map((conversation) => (
-                <tr key={conversation._id} className="hover:bg-gray-50">
-                  <td 
-                    className="border border-gray-300 px-4 py-2 text-blue-600 cursor-pointer hover:underline"
+                <tr key={conversation._id} className="hover:bg-[#292929] transition">
+                  <td
+                    className="border border-[#c0bb39]/50 px-4 py-2 text-[#c0bb39] cursor-pointer hover:text-[#d4d054] transition"
                     onClick={() => setSelectedConversation(conversation)}
                   >
                     {conversation.title}
                   </td>
-                  <td className="border border-gray-300 px-4 py-2">
+                  <td className="border border-[#c0bb39]/50 px-4 py-2 text-[#c0bb39]">
                     {new Date(conversation.createdAt).toLocaleString("fr-FR", {
                       day: "2-digit",
                       month: "2-digit",
@@ -82,12 +90,12 @@ export default function RecorderPage() {
                       minute: "2-digit",
                     })}
                   </td>
-                  <td className="border border-gray-300 px-4 py-2 text-center">
+                  <td className="border border-[#c0bb39]/50 px-4 py-2 text-center">
                     <button
-                      className="px-3 py-1 text-white bg-red-500 rounded hover:bg-red-600"
+                      className="px-3 py-1 text-[#c0bb39] bg-[#6d1717] rounded-lg hover:bg-[#580f0f] transition"
                       onClick={() => deleteConversation(conversation._id)}
                     >
-                      Supprimer
+                      🗑️ Supprimer
                     </button>
                   </td>
                 </tr>
@@ -95,7 +103,7 @@ export default function RecorderPage() {
             </tbody>
           </table>
         ) : (
-          <p className="text-gray-500 text-center">Aucun historique de conversation disponible pour ce scénario.</p>
+          <p className="text-[#c0bb39] text-center">Aucun historique de conversation disponible pour ce scénario.</p>
         )}
       </div>
 
@@ -103,3 +111,4 @@ export default function RecorderPage() {
     </div>
   );
 }
+
