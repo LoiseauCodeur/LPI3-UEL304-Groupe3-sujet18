@@ -2,8 +2,24 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (status !== "loading" && !session) {
+      router.push("/login"); 
+    }
+  }, [session, status, router]);
+
+  if (status === "loading") {
+    return <p className="text-white text-center mt-10">Chargement...</p>;
+  }
+
   const recorderModes = [
     { mode: "single", title: "Pratiquer un exposé oral", key: "studentOralPresentation" },
     { mode: "conversation", title: "Simuler un entretien d'embauche", key: "jobInterview" },
