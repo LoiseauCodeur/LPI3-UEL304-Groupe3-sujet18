@@ -44,62 +44,93 @@ export default function RecorderPage() {
   const { title, mode: recorderMode, maxExchanges } = recorderConfigs[mode];
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-white p-6">
-      <a href="/" className="mt-6 text-blue-500 hover:underline">Retour à l'accueil</a>
-      <h1 className="text-2xl font-bold mb-4">{title}</h1>
-      <Recorder mode={recorderMode} promptKey={mode} maxExchanges={maxExchanges} refreshHistory={fetchConversations}  />
+    <div className="flex flex-col min-h-screen bg-[#f8ffff]">
+      {/* Header */}
+      <header className="bg-[#004aad] text-white py-4 shadow-md">
+        <div className="container mx-auto flex items-center justify-center md:justify-start px-6">
+          {/* Logo */}
+          <a href="/" className="flex items-center space-x-3">
+            <img src="/logo.png" alt="Logo AI Speech Trainer" className="h-10 w-auto" />
+            <h1 className="text-2xl font-bold hidden md:block">AI Speech Trainer</h1>
+          </a>
+        </div>
+      </header>
 
-      {/* Historique */}
-      <div className="mt-8 w-full max-w-lg">
-        <h2 className="text-xl font-semibold mb-4">Historique</h2>
+      {/* Contenu principal */}
+      <main className="flex flex-col items-center flex-grow p-6">
+        <a href="/" className="mt-4 text-[#004aad] hover:underline font-semibold">
+          ◀ Retour à l'accueil
+        </a>
 
-        {isFetching ? (
-          <p className="text-gray-500 text-center">Chargement...</p>
-        ) : filteredConversations.length > 0 ? (
-          <table className="w-full border-collapse border border-gray-300 bg-gray-100 rounded-md">
-            <thead>
-              <tr className="bg-gray-200">
-                <th className="border border-gray-300 px-4 py-2 text-left">Titre</th>
-                <th className="border border-gray-300 px-4 py-2 text-left">Date</th>
-                <th className="border border-gray-300 px-4 py-2">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredConversations.map((conversation) => (
-                <tr key={conversation._id} className="hover:bg-gray-50">
-                  <td 
-                    className="border border-gray-300 px-4 py-2 text-blue-600 cursor-pointer hover:underline"
-                    onClick={() => setSelectedConversation(conversation)}
-                  >
-                    {conversation.title}
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2">
-                    {new Date(conversation.createdAt).toLocaleString("fr-FR", {
-                      day: "2-digit",
-                      month: "2-digit",
-                      year: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2 text-center">
-                    <button
-                      className="px-3 py-1 text-white bg-red-500 rounded hover:bg-red-600"
-                      onClick={() => deleteConversation(conversation._id)}
-                    >
-                      Supprimer
-                    </button>
-                  </td>
+        <h1 className="text-3xl font-bold text-[#004aad] mt-4">{title}</h1>
+        
+        <Recorder 
+          mode={recorderMode} 
+          promptKey={mode} 
+          maxExchanges={maxExchanges} 
+          refreshHistory={fetchConversations}  
+        />
+
+        {/* Historique */}
+        <div className="mt-8 w-full max-w-lg">
+          <h2 className="text-2xl font-semibold text-[#004aad] mb-4">📜 Historique</h2>
+
+          {isFetching ? (
+            <p className="text-[#004aad] text-center">⏳ Chargement...</p>
+          ) : filteredConversations.length > 0 ? (
+            <table className="w-full border-collapse border border-[#004aad] bg-[#a8d2e9] rounded-md shadow-lg">
+              <thead>
+                <tr className="bg-[#004aad] text-white">
+                  <th className="border border-[#004aad] px-4 py-2 text-left">Titre</th>
+                  <th className="border border-[#004aad] px-4 py-2 text-left">Date</th>
+                  <th className="border border-[#004aad] px-4 py-2 text-center">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : (
-          <p className="text-gray-500 text-center">Aucun historique de conversation disponible pour ce scénario.</p>
-        )}
-      </div>
+              </thead>
+              <tbody>
+                {filteredConversations.map((conversation) => (
+                  <tr key={conversation._id} className="hover:bg-[#f8ffff] transition">
+                    <td 
+                      className="border border-[#004aad] px-4 py-2 text-[#004aad] cursor-pointer hover:underline"
+                      onClick={() => setSelectedConversation(conversation)}
+                    >
+                      {conversation.title}
+                    </td>
+                    <td className="border border-[#004aad] px-4 py-2 text-[#004aad]">
+                      {new Date(conversation.createdAt).toLocaleString("fr-FR", {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </td>
+                    <td className="border border-[#004aad] px-4 py-2 text-center">
+                      <button
+                        className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition"
+                        onClick={() => deleteConversation(conversation._id)}
+                      >
+                        🗑 Supprimer
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <p className="text-[#004aad] text-center">Aucun historique de conversation disponible pour ce scénario.</p>
+          )}
+        </div>
 
-      <ConversationModal conversation={selectedConversation} onClose={() => setSelectedConversation(null)} />
+        <ConversationModal 
+          conversation={selectedConversation} 
+          onClose={() => setSelectedConversation(null)} 
+        />
+      </main>
+
+      {/* Footer */}
+      <footer className="bg-[#004aad] text-white py-3 text-sm text-center">
+        © {new Date().getFullYear()} AI Speech Trainer - Tous droits réservés
+      </footer>
     </div>
   );
 }

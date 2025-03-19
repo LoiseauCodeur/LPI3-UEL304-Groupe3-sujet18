@@ -11,11 +11,20 @@ const ConversationModal: React.FC<ConversationModalProps> = ({ conversation, onC
   if (!conversation) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-      <div className="bg-white p-6 rounded-md shadow-lg w-full max-w-3xl max-h-[80vh] overflow-y-auto"> 
-        <h2 className="text-xl font-semibold mb-2">{conversation.title}</h2>
-        <p className="text-gray-500 mb-4">
-          {new Date(conversation.createdAt).toLocaleString("fr-FR", {
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div className="bg-[#f8ffff] p-6 rounded-2xl shadow-xl w-full max-w-3xl max-h-[80vh] overflow-y-auto relative">
+        {/* Bouton de fermeture en haut à droite */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-white bg-red-500 hover:bg-red-600 p-2 rounded-full transition duration-300"
+          aria-label="Fermer la modale"
+        >
+          ✖
+        </button>
+
+        <h2 className="text-2xl font-bold text-[#004aad] mb-2">{conversation.title}</h2>
+        <p className="text-gray-600 mb-4 text-sm italic">
+          📅 {new Date(conversation.createdAt).toLocaleString("fr-FR", {
             day: "2-digit",
             month: "2-digit",
             year: "numeric",
@@ -23,28 +32,36 @@ const ConversationModal: React.FC<ConversationModalProps> = ({ conversation, onC
             minute: "2-digit",
           })}
         </p>
-        
-        <div className="border-t pt-4">
-          <h3 className="text-lg font-medium mb-1">Texte:</h3>
-          <p className="text-gray-700 whitespace-pre-line">{conversation.text}</p>
+
+        {/* Texte de la conversation */}
+        <div className="border-t border-gray-300 pt-4">
+          <h3 className="text-lg font-semibold text-[#004aad] mb-2">📝 Texte :</h3>
+          <p className="text-gray-800 bg-[#a8d2e9] p-3 rounded-md whitespace-pre-line shadow-md">
+            {conversation.text}
+          </p>
         </div>
 
-        <div className="border-t pt-4 mt-4">
-          <h3 className="text-lg font-medium mb-1">Retour final:</h3>
-          <ChatDisplay
-            response={typeof conversation.finalResponse === "string"
-                ? JSON.parse(conversation.finalResponse)
-                : conversation.finalResponse}
+        {/* Retour final */}
+        <div className="border-t border-gray-300 pt-4 mt-4">
+          <h3 className="text-lg font-semibold text-[#004aad] mb-2">💬 Retour final :</h3>
+          <div className="bg-white p-3 rounded-md shadow-md">
+            <ChatDisplay
+              response={
+                typeof conversation.finalResponse === "string"
+                  ? JSON.parse(conversation.finalResponse)
+                  : conversation.finalResponse
+              }
             />
-
+          </div>
         </div>
 
+        {/* Bouton de fermeture en bas */}
         <div className="mt-6 flex justify-end">
           <button
-            className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
             onClick={onClose}
+            className="px-5 py-2 text-white font-semibold bg-[#004aad] hover:bg-[#003488] rounded-lg transition duration-300 shadow-md"
           >
-            Fermer
+            🔙 Fermer
           </button>
         </div>
       </div>
@@ -53,3 +70,4 @@ const ConversationModal: React.FC<ConversationModalProps> = ({ conversation, onC
 };
 
 export default ConversationModal;
+

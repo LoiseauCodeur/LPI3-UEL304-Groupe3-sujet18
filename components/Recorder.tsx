@@ -99,35 +99,43 @@ export default function Recorder({ mode, maxExchanges = 5, promptKey, refreshHis
   
     await refreshHistory();
   };
-  
 
   const { isRecording, startRecording, stopRecording } = useRecorder(onTranscription);
 
   return (
-    <div className="flex flex-col items-center justify-center p-6">
+    <div className="flex flex-col items-center justify-center p-6 w-full max-w-2xl bg-[#f8ffff] shadow-md rounded-lg">
       {isFinalResponseShown ? (
         <button
           onClick={handleNewExchange}
-          className="px-5 py-3 text-white text-lg rounded transition duration-300 bg-green-600 hover:bg-green-700"
+          className="px-5 py-3 text-white text-lg rounded-lg transition duration-300 bg-green-600 hover:bg-green-700 shadow-md"
         >
-          Nouvel échange
+          🔄 Nouvel échange
         </button>
       ) : (
         <button
           onClick={isRecording ? stopRecording : startRecording}
-          className={`px-5 py-3 text-white text-lg rounded transition duration-300 ${
-            isRecording ? "bg-red-500 hover:bg-red-600" : "bg-blue-600 hover:bg-blue-700"
+          className={`px-5 py-3 text-white text-lg font-semibold rounded-lg transition duration-300 shadow-md ${
+            isRecording ? "bg-red-500 hover:bg-red-600" : "bg-[#004aad] hover:bg-[#003488]"
           }`}
         >
-          {isRecording ? "Arrêter l'enregistrement" : "Commencer l'enregistrement"}
+          {isRecording ? "⏹ Arrêter l'enregistrement" : "🎤 Commencer l'enregistrement"}
         </button>
       )}
 
-      {isLoading && <p className="mt-4 text-gray-600 text-sm">⏳ Traitement en cours...</p>}
+      {isLoading && (
+        <div className="mt-4 flex items-center space-x-2 text-[#004aad]">
+          <span className="animate-spin h-5 w-5 border-4 border-[#004aad] border-t-transparent rounded-full"></span>
+          <p className="text-lg">Traitement en cours...</p>
+        </div>
+      )}
+
       {jsonResponse && <ChatDisplay response={jsonResponse} />}
       {aiResponse && !jsonResponse && (
-        <p className="mt-4 text-teal-600 text-lg italic max-w-4xl text-center">{aiResponse}</p>
+        <p className="mt-4 text-[#004aad] text-lg italic max-w-4xl text-center bg-[#a8d2e9] p-4 rounded-lg shadow-md">
+          {aiResponse}
+        </p>
       )}
     </div>
   );
 }
+
