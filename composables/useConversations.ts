@@ -23,18 +23,19 @@ export function useConversations() {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchConversations = async () => {
+  const fetchConversations = async (mode?: string) => {
     setLoading(true);
     try {
-      const response = await fetch("/api/conversations");
+      const url = mode ? `/api/conversations?mode=${mode}` : "/api/conversations";
+  
+      const response = await fetch(url);
       const data = await response.json();
+  
       if (data.success) {
-        setConversations(
-          data.data.map((conv: any) => ({
-            ...conv,
-            finalResponse: typeof conv.finalResponse === "string" ? JSON.parse(conv.finalResponse) : conv.finalResponse,
-          }))
-        );
+        setConversations(prev => data.data.map((conv: any) => ({
+          ...conv,
+          finalResponse: isValidJSON(conv.finalResponse) ? JSON.parse(conv.finalResponse) : conv.finalResponse,
+        })));
       } else {
         setError(data.error || "Failed to fetch conversations");
       }
@@ -42,8 +43,7 @@ export function useConversations() {
       setError("Network error");
     }
     setLoading(false);
-  };
-  
+  };  
 
   const fetchConversationById = async (id: string): Promise<Conversation | null> => {
     setLoading(true);
@@ -105,6 +105,16 @@ export function useConversations() {
       setError(err.message);
     }
   };
+
+  const isValidJSON = (str: any) => {
+    if (typeof str !== "string") return false;
+    try {
+      JSON.parse(str);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  };  
 
   useEffect(() => {
     fetchConversations();
