@@ -7,6 +7,7 @@ interface IConversation extends Document {
   score?: number | null;
   createdAt: Date;
   scenario: string;
+  userEmail: string;
 }
 
 const ConversationSchema: Schema = new Schema(
@@ -17,6 +18,7 @@ const ConversationSchema: Schema = new Schema(
     score: { type: Number, required: false, default: null },
     createdAt: { type: Date, required: true, default: Date.now },
     scenario: { type: String, required: true },
+    userEmail: { type: String, required: true },
   },
   { timestamps: true }
 );

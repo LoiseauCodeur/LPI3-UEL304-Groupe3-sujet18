@@ -29,9 +29,12 @@ export default function RecorderPage() {
   useEffect(() => {
     if (mode) {
       setIsFetching(true);
-      fetchConversations().finally(() => setIsFetching(false));
+      fetchConversations(mode).then(() => {
+        setIsFetching(false);
+      });
     }
   }, [mode]);
+  
 
   useEffect(() => {
     if (mode && conversations) {
