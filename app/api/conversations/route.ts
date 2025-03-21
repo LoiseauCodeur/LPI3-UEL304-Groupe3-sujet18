@@ -3,7 +3,7 @@ import { connectToDatabase } from "@/lib/mongodb";
 import Conversation from "@/models/Conversation";
 import mongoose from "mongoose";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]";
+import { authOptions } from "@/lib/authOptions";
 
 export async function POST(req: Request) {
   await connectToDatabase();
@@ -42,7 +42,8 @@ export async function GET(req: Request) {
   await connectToDatabase();
   
   try {
-    const session = await getServerSession(authOptions);
+    // const session = await getServerSession(authOptions);
+    const session = await getServerSession();
     if (!session || !session.user || !session.user.email) {
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
     }
