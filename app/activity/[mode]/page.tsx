@@ -10,7 +10,7 @@ import Link from "next/link";
 const recorderConfigs: Record<string, { mode: "single" | "conversation"; title: string; maxExchanges?: number }> = {
   studentOralPresentation: { mode: "single", title: "Pratiquer un exposé oral" },
   jobInterview: { mode: "conversation", title: "Simuler un entretien d'embauche", maxExchanges: 5 },
-  meetingPresentation: { mode: "conversation", title: "Simuler une réunion professionnelle", maxExchanges: 2 },
+  meetingPresentation: { mode: "conversation", title: "Simuler une réunion professionnelle", maxExchanges: 5 },
   oralSessionSummary: { mode: "single", title: "Obtenir le résumé d'un discours" },
   reformulation: { mode: "single", title: "Améliorer son expression" },
   speechScriptGeneration: { mode: "single", title: "Générer un script de discours" },
