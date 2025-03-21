@@ -1,17 +1,27 @@
-import { connectToDatabase } from "@/lib/mongodb";
-import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
+import bcrypt from "bcryptjs";
+import { MongoClient, Db } from "mongodb";
+
+export async function connectToDatabase(): Promise<MongoClient> {
+  const client = new MongoClient(process.env.MONGODB_URI!);
+  await client.connect();
+  return client;
+}
 
 export async function POST(req: Request) {
   try {
+    const { username, email, password } = await req.json();
+
+    if (!username || !email || !password) {
+      return NextResponse.json({ error: "Tous les champs sont requis" }, { status: 400 });
+    }
+
     const client = await connectToDatabase();
-    const db = client.db(process.env.MONGODB_DB);
+    const db: Db = client.db(process.env.MONGODB_DB); 
     const usersCollection = db.collection("users");
 
-    const { username, email, password } = await req.json();
-    
-    const existingUser = await usersCollection.findOne({ 
-      $or: [{ email }, { username }] 
+    const existingUser = await usersCollection.findOne({
+      $or: [{ email }, { username }],
     });
 
     if (existingUser) {
@@ -31,9 +41,13 @@ export async function POST(req: Request) {
       throw new Error("Erreur lors de l'insertion dans la base de données");
     }
 
-    return NextResponse.redirect(new URL("/login", req.url));
+    return NextResponse.json({ message: "Inscription réussie" }, { status: 201 });
   } catch (error) {
     console.error("Erreur API signup:", error);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
+}
+
+export function OPTIONS() {
+  return NextResponse.json({}, { status: 200 });
 }

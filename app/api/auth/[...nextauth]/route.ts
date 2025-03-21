@@ -1,72 +1,59 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { connectToDatabase } from "@/lib/mongodb";
-import User from "@/models/User";
-import bcrypt from "bcryptjs";
+import mongoose from "mongoose";
+import { compare } from "bcryptjs";
 
-const handler = NextAuth({
+async function connectToDatabase() {
+  if (!mongoose.connection.readyState) {
+    await mongoose.connect(process.env.MONGODB_URI!, {
+      dbName: process.env.MONGODB_DB,
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    } as any);
+  }
+}
+
+export const authOptions = {
   providers: [
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        email: { label: "Email", type: "text" },
-        password: { label: "Mot de passe", type: "password" }
+        email: { label: "Email", type: "email" },
+        password: { label: "Mot de passe", type: "password" },
       },
       async authorize(credentials) {
-        try {
-          console.log("Tentative de connexion avec", credentials?.email);
-
-          const client = await connectToDatabase();
-          const db = client.db(process.env.MONGODB_DB);
-          const usersCollection = db.collection("users");
-
-          const user = await usersCollection.findOne({ email: credentials?.email });
-          console.log("Utilisateur trouvé dans la base de données :", user);
-
-          if (!user) {
-            console.log("Utilisateur non trouvé");
-            throw new Error("Utilisateur non trouvé");
-          }
-
-          const isValidPassword = await bcrypt.compare(credentials?.password || "", user.password);
-          console.log("Mot de passe valide :", isValidPassword);
-
-          if (!isValidPassword) {
-            console.log("Mot de passe incorrect");
-            throw new Error("Mot de passe incorrect");
-          }
-
-          console.log("Utilisateur authentifié : ", user);
-          return { id: user._id.toString(), name: user.username, email: user.email };
-        } catch (error) {
-          console.error("Erreur dans l'autorisation : ", error);
-          return null;
+        if (!credentials?.email || !credentials?.password) {
+          throw new Error("Les identifiants sont requis");
         }
-      }
-    })
+
+        await connectToDatabase();
+        const db = mongoose.connection.db;
+        const user = await db.collection("users").findOne({ email: credentials.email });
+
+        if (!user) {
+          throw new Error("Utilisateur non trouvé");
+        }
+
+        const isValid = await compare(credentials.password, user.password);
+        if (!isValid) {
+          throw new Error("Mot de passe incorrect");
+        }
+
+        return { id: user._id.toString(), email: user.email };
+      },
+    }),
   ],
+  pages: {
+    signIn: "/login",
+    error: "/login",
+    signOut: "/logout",
+    newUser: "/signup",
+  },
   session: {
-    strategy: "jwt"
+    strategy: "jwt" as const,
   },
   secret: process.env.NEXTAUTH_SECRET,
-  callbacks: {
-    async jwt({ token, user }) {
-      // Persister les informations de l'utilisateur dans le JWT
-      if (user) {
-        token.id = user.id;
-        token.name = user.name;
-        token.email = user.email;
-      }
-      return token;
-    },
-    async session({ session, token }) {
-      if (token && session.user) {
-        session.user.name = token.name;
-        session.user.email = token.email;
-      }
-      return session;
-    }
-  }
-});
+};
 
+const handler = NextAuth(authOptions);
 export { handler as GET, handler as POST };
