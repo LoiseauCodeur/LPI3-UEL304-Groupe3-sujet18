@@ -42,7 +42,6 @@ export default function RecorderPage() {
     }
   }, [mode, conversations]);
 
-  // 🔥 Correction : Formatage des dates côté client
   useEffect(() => {
     const newFormattedDates: { [key: string]: string } = {};
     filteredConversations.forEach((conv) => {
@@ -65,18 +64,14 @@ export default function RecorderPage() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-[#232323] to-[#333232] p-6 text-[#c0bb39]">
-      {/* Lien de retour */}
       <Link href="/" className="mb-6 text-[#c0bb39] hover:underline hover:text-[#d4d054] transition">
         ← Retour à l'accueil
       </Link>
 
-      {/* Titre */}
       <h1 className="text-3xl font-extrabold mb-6">{title}</h1>
 
-      {/* Enregistreur */}
       <Recorder mode={recorderMode} promptKey={mode} maxExchanges={maxExchanges} refreshHistory={fetchConversations} />
 
-      {/* Historique */}
       <div className="mt-8 w-full max-w-lg bg-[#1a1a1a] p-6 rounded-lg shadow-lg border border-[#c0bb39]/30">
         <h2 className="text-xl font-semibold mb-4 text-[#c0bb39]">Historique</h2>
 
