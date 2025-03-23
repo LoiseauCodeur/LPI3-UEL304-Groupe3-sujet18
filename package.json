@@ -2,6 +2,10 @@
   "name": "socialai",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": "22.14.0",
+    "npm": "9.6.4"
+  },
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
