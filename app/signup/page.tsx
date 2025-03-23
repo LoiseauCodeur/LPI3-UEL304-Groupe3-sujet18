@@ -41,7 +41,7 @@ const Signup = () => {
   };
 
   return (
-    <div className="flex justify-center items-center mt-36">
+    <div className="flex justify-center items-center md-mt-36">
       <Card
         title={<Title level={2} className=" text-center">Inscription</Title>}
         className="w-full max-w-md border border-white/30 shadow-lg"
@@ -52,7 +52,7 @@ const Signup = () => {
             name="username"
             rules={[{ required: true, message: "Veuillez entrer un nom d'utilisateur" }]}
           >
-            <Input className="border border-white" />
+            <Input className="bg-blue-200 border border-white" />
           </Form.Item>
 
           <Form.Item
@@ -63,7 +63,7 @@ const Signup = () => {
               { type: "email", message: "Email invalide" },
             ]}
           >
-            <Input className=" border border-white" />
+            <Input className="bg-blue-200 border border-white" />
           </Form.Item>
 
           <Form.Item
@@ -74,7 +74,7 @@ const Signup = () => {
               { min: 6, message: "Au moins 6 caractères" },
             ]}
           >
-            <Input.Password className=" text-white border border-white" />
+            <Input.Password className="bg-blue-200 text-white border border-white" />
           </Form.Item>
 
           <Button

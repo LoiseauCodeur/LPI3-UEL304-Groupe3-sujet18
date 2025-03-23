@@ -15,25 +15,27 @@ async function connectToDatabase() {
   }
 }
 
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const email = searchParams.get("email");
-
-  if (!email) {
-    return NextResponse.json({ error: "Email manquant" }, { status: 400 });
-  }
-
+export async function POST(request: Request) {
   try {
-    await connectToDatabase();
-    const user = await User.findOne({ email }, "username createdAt");
+    const { email, username, password } = await request.json();
 
-    if (!user) {
-      return NextResponse.json({ error: "Utilisateur non trouvé" }, { status: 404 });
+    if (!email || !username || !password) {
+      return NextResponse.json({ error: "Les champs sont manquants" }, { status: 400 });
     }
 
-    return NextResponse.json(user);
+    await connectToDatabase();
+
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return NextResponse.json({ error: "L'utilisateur existe déjà" }, { status: 409 });
+    }
+
+    const newUser = new User({ email, username, password });
+    await newUser.save();
+
+    return NextResponse.json({ message: "Utilisateur créé avec succès" }, { status: 201 });
   } catch (error) {
-    console.error("❗ Erreur lors de la récupération de l’utilisateur :", error);
+    console.error("❗ Erreur lors de l'enregistrement de l'utilisateur :", error);
     return NextResponse.json({ error: "Erreur interne du serveur" }, { status: 500 });
   }
 }
