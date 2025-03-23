@@ -7,17 +7,13 @@ import "antd/dist/reset.css";
 import { toast } from "react-hot-toast";
 
 const { Text, Title } = Typography;
-console.log("test 1"); // Vérifie si l'appel se fait bien
 
 const Signup = () => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const onFinish = async (values: any) => {
-    console.log("test 2"); // Vérifie si l'appel se fait bien
-
     setLoading(true);
-    console.log("➡️ Envoi des données:", values);
 
     try {
       const response = await fetch("/api/auth/signup", {
@@ -26,27 +22,10 @@ const Signup = () => {
         body: JSON.stringify(values),
       });
 
-      console.log("📥 Réponse reçue:", response);
-
-      // Vérifie si la réponse a un contenu JSON
-      let data: { error?: string } = {};
-      try {
-        data = await response.json();
-        console.log("✅ JSON parsé:", data);
-      } catch (jsonError) {
-        console.error("❌ Erreur parsing JSON:", jsonError);
-      }
+      const data = await response.json();
 
       if (!response.ok) {
-        console.log("🚨 Erreur API détectée:", data);
-
-        if ("error" in data) {
-          toast.error(data.error || "Une erreur inconnue est survenue.");
-        } else {
-          console.log("🔴 Affichage message d'erreur générique");
-          toast.error("Une erreur est survenue !");
-        }
-
+        toast.error(data.error || "Une erreur est survenue !");
         setLoading(false);
         return;
       }
@@ -54,7 +33,7 @@ const Signup = () => {
       toast.success("Inscription réussie ! Redirection...");
       router.push("/login");
     } catch (error) {
-      console.error("❌ Erreur attrapée:", error);
+      console.error("Erreur attrapée:", error);
       toast.error("Erreur de connexion au serveur");
     } finally {
       setLoading(false);
@@ -62,40 +41,40 @@ const Signup = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-900">
+    <div className="flex justify-center items-center mt-36">
       <Card
-        title={<Title level={2} className="!text-yellow-400 text-center">Inscription</Title>}
-        className="w-full max-w-md bg-gray-800 border border-yellow-500/30 shadow-lg"
+        title={<Title level={2} className=" text-center">Inscription</Title>}
+        className="w-full max-w-md border border-white/30 shadow-lg"
       >
         <Form layout="vertical" onFinish={onFinish} noValidate>
           <Form.Item
-            label={<Text className="text-white">Nom d'utilisateur</Text>}
+            label={<Text>Nom d'utilisateur</Text>}
             name="username"
             rules={[{ required: true, message: "Veuillez entrer un nom d'utilisateur" }]}
           >
-            <Input className="bg-gray-700 text-yellow-600 border border-yellow-500" />
+            <Input className="border border-white" />
           </Form.Item>
 
           <Form.Item
-            label={<Text className="text-white">Email</Text>}
+            label={<Text className="">Email</Text>}
             name="email"
             rules={[
               { required: true, message: "Veuillez entrer un email" },
               { type: "email", message: "Email invalide" },
             ]}
           >
-            <Input className="bg-gray-700 text-yellow-600 border border-yellow-500" />
+            <Input className=" border border-white" />
           </Form.Item>
 
           <Form.Item
-            label={<Text className="text-white">Mot de passe</Text>}
+            label={<Text >Mot de passe</Text>}
             name="password"
             rules={[
               { required: true, message: "Veuillez entrer un mot de passe" },
               { min: 6, message: "Au moins 6 caractères" },
             ]}
           >
-            <Input.Password className="bg-gray-700 text-yellow-600 border border-yellow-500" />
+            <Input.Password className=" text-white border border-white" />
           </Form.Item>
 
           <Button
@@ -103,17 +82,16 @@ const Signup = () => {
             htmlType="submit"
             loading={loading}
             block
-            className="bg-yellow-500 border-none hover:bg-yellow-400 text-black font-semibold"
+            className="bg-blue-600 border-none hover:bg-gray-300font-semibold"
           >
             S'inscrire
           </Button>
 
           <div className="text-center mt-4">
-            <Text className="text-white">Déjà un compte ? </Text>
+            <Text className="">Déjà un compte ? </Text>
             <Button
               type="link"
               onClick={() => router.push("/login")}
-              className="text-yellow-400"
             >
               Se connecter
             </Button>

@@ -63,8 +63,8 @@ export default function RecorderPage() {
   const { title, mode: recorderMode, maxExchanges } = recorderConfigs[mode];
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-[#232323] to-[#333232] p-6 text-[#c0bb39]">
-      <Link href="/" className="mb-6 text-[#c0bb39] hover:underline hover:text-[#d4d054] transition">
+    <div className="flex flex-col items-center justify-center min-h-screenp-6 text-blue-800">
+      <Link href="/" className="mb-6 text-blue-600 hover:underline hover:text-blue-500 transition">
         ← Retour à l'accueil
       </Link>
 
@@ -72,35 +72,35 @@ export default function RecorderPage() {
 
       <Recorder mode={recorderMode} promptKey={mode} maxExchanges={maxExchanges} refreshHistory={fetchConversations} />
 
-      <div className="mt-8 w-full max-w-lg bg-[#1a1a1a] p-6 rounded-lg shadow-lg border border-[#c0bb39]/30">
-        <h2 className="text-xl font-semibold mb-4 text-[#c0bb39]">Historique</h2>
+      <div className="mt-8 w-full max-w-lg bg-white p-6 rounded-lg shadow-lg border border-blue-100">
+        <h2 className="text-xl font-semibold mb-4 text-blue-800">Historique</h2>
 
         {isFetching ? (
-          <p className="text-[#c0bb39] text-center">⏳ Chargement...</p>
+          <p className="text-blue-600 text-center">⏳ Chargement...</p>
         ) : filteredConversations.length > 0 ? (
-          <table className="w-full border-collapse border border-[#c0bb39]/50">
+          <table className="w-full border-collapse border border-blue-200">
             <thead>
-              <tr className="bg-[#2a2a2a] text-[#c0bb39]">
-                <th className="border border-[#c0bb39]/50 px-4 py-2 text-left">Titre</th>
-                <th className="border border-[#c0bb39]/50 px-4 py-2 text-left">Date</th>
-                <th className="border border-[#c0bb39]/50 px-4 py-2 text-center">Actions</th>
+              <tr className="bg-blue-100 text-blue-800">
+                <th className="border border-blue-200 px-4 py-2 text-left">Titre</th>
+                <th className="border border-blue-200 px-4 py-2 text-left">Date</th>
+                <th className="border border-blue-200 px-4 py-2 text-center">Actions</th>
               </tr>
             </thead>
             <tbody>
               {filteredConversations.map((conversation) => (
-                <tr key={conversation._id} className="hover:bg-[#292929] transition">
+                <tr key={conversation._id} className="hover:bg-blue-50 transition">
                   <td
-                    className="border border-[#c0bb39]/50 px-4 py-2 text-[#c0bb39] cursor-pointer hover:text-[#d4d054] transition"
+                    className="border border-blue-200 px-4 py-2 text-blue-800 cursor-pointer hover:text-blue-600 transition"
                     onClick={() => setSelectedConversation(conversation)}
                   >
                     {conversation.title}
                   </td>
-                  <td className="border border-[#c0bb39]/50 px-4 py-2 text-[#c0bb39]">
+                  <td className="border border-blue-200 px-4 py-2 text-blue-800">
                     {formattedDates[conversation._id] || "Chargement..."}
                   </td>
-                  <td className="border border-[#c0bb39]/50 px-4 py-2 text-center">
+                  <td className="border border-blue-200 px-4 py-2 text-center">
                     <button
-                      className="px-3 py-1 text-[#c0bb39] bg-[#6d1717] rounded-lg hover:bg-[#580f0f] transition"
+                      className="px-3 py-1 text-white bg-red-500 rounded-lg hover:bg-red-600 transition"
                       onClick={() => deleteConversation(conversation._id)}
                     >
                       🗑️ Supprimer
@@ -111,7 +111,7 @@ export default function RecorderPage() {
             </tbody>
           </table>
         ) : (
-          <p className="text-[#c0bb39] text-center">Aucun historique de conversation disponible pour ce scénario.</p>
+          <p className="text-blue-600 text-center">Aucun historique de conversation disponible pour ce scénario.</p>
         )}
       </div>
 
