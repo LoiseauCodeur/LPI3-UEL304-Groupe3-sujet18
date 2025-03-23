@@ -37,7 +37,7 @@ export default function Home() {
   ];
 
   return (
-    <div className="flex flex-col h-2/4 mt-10 overflow-hidden">
+    <div className="flex flex-col mt-10 overflow-hidden">
       <div className="flex-1 grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-3 gap-6 px-32 md-px-32 py-8">
         {recorderModes.map(({ title, key, icon }) => (
           <Link key={key} href={`/activity/${key}`} className="group relative block w-full h-48 cursor-pointer">
