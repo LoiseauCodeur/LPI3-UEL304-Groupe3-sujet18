@@ -41,7 +41,7 @@ const Login = () => {
   };
 
   return (
-    <div className="flex justify-center mt-44">
+    <div className="flex justify-center !mt-0 md:mt-24">
       <Card
         title={<h2 className="text-blue-600 text-center">Connexion</h2>}
         className="w-full max-w-md border border-blue-100 shadow-lg"

@@ -52,12 +52,15 @@ function Header() {
   }, [sessionData]);
 
   return (
-    <div className="flex items-center justify-between p-6 relative z-10 w-10/12 m-auto">
-      <Image src="/logo1.png" alt="Logo" width={150} height={150} className="mx-auto" />
+    <div className="relative w-10/12 m-auto p-6">
+      <div className="flex justify-center items-center">
+        <Image src="/logo1.png" alt="Logo" width={150} height={150} className="mx-auto" />
+      </div>
+
       {status === "authenticated" && userInfo ? (
-        <div className="relative">
-          <button onClick={() => setShowInfo(!showInfo)} className="flex items-center space-x-4">
-            <div className="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center text-gray-700 font-bold absolute">
+        <div className="absolute right-0 top-1/2 transform -translate-y-1/2 flex items-center space-x-4">
+          <button onClick={() => setShowInfo(!showInfo)} className="relative flex items-center space-x-4">
+            <div className="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center text-gray-700 font-bold">
               {userInfo.username[0].toUpperCase()}
             </div>
           </button>
