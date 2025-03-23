@@ -74,7 +74,7 @@ const Signup = () => {
               { min: 6, message: "Au moins 6 caractères" },
             ]}
           >
-            <Input.Password className="bg-blue-200 text-white border border-white" />
+            <Input.Password className="bg-blue-200  border border-white" />
           </Form.Item>
 
           <Button
