@@ -103,7 +103,6 @@ export default function Recorder({ mode, maxExchanges = 5, promptKey, refreshHis
 
   return (
     <div className="flex flex-col items-center justify-center p-6 text-[#c0bb39]">
-      {/* Bouton d'interaction */}
       {isFinalResponseShown ? (
         <button
           onClick={handleNewExchange}
@@ -124,10 +123,8 @@ export default function Recorder({ mode, maxExchanges = 5, promptKey, refreshHis
         </button>
       )}
 
-      {/* Message de chargement */}
       {isLoading && <p className="mt-4 text-[#c0bb39] text-sm italic animate-pulse">⏳ Traitement en cours...</p>}
 
-      {/* Affichage des réponses */}
       {jsonResponse && <ChatDisplay response={jsonResponse} />}
       {aiResponse && !jsonResponse && (
         <p className="mt-4 text-lg italic max-w-4xl text-center text-[#c0bb39]/80">{aiResponse}</p>

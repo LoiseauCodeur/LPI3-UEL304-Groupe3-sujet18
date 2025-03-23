@@ -1,6 +1,5 @@
 "use client";
 
-
 import { signIn, getCsrfToken } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { Form, Input, Button, message, Card, Typography } from "antd";
@@ -42,24 +41,26 @@ const Login = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-900">
+    <div className="flex justify-center mt-44">
       <Card
-        title={<h2 className="text-yellow-400 text-center">Connexion</h2>}
-        className="w-full max-w-md bg-gray-800 border border-yellow-500/30 shadow-lg"
+        title={<h2 className="text-blue-600 text-center">Connexion</h2>}
+        className="w-full max-w-md border border-blue-100 shadow-lg"
       >
         <Form onFinish={onFinish} layout="vertical">
           <Form.Item
-            label={<Text className="text-white">Email</Text>}
+            label={<Text className="text-blue-800">Email</Text>}
             name="email"
-            rules={[{ required: true, type: "email", message: "Email valide requis" }]}>
-            <Input className="bg-gray-700 text-yellow-600 border border-yellow-500" />
+            rules={[{ required: true, type: "email", message: "Email valide requis" }]}
+          >
+            <Input className="bg-blue-50 text-blue-800 border border-blue-300" />
           </Form.Item>
 
           <Form.Item
-            label={<Text className="text-white">Mot de passe</Text>}
+            label={<Text className="text-blue-800">Mot de passe</Text>}
             name="password"
-            rules={[{ required: true, message: "Mot de passe requis" }]}>
-            <Input.Password className="bg-gray-700 text-yellow-600 border border-yellow-500" />
+            rules={[{ required: true, message: "Mot de passe requis" }]}
+          >
+            <Input.Password className="bg-blue-50 text-blue-800 border border-blue-300" />
           </Form.Item>
 
           <Button
@@ -67,17 +68,17 @@ const Login = () => {
             htmlType="submit"
             loading={loading}
             block
-            className="bg-yellow-500 border-none hover:bg-yellow-400 text-black font-semibold"
+            className="bg-blue-600 border-none hover:bg-blue-500 text-white font-semibold"
           >
             Se connecter
           </Button>
 
           <div className="text-center mt-4">
-            <Text className="text-white">Pas encore de compte ? </Text>
+            <Text className="text-blue-800">Pas encore de compte ? </Text>
             <Button
               type="link"
               onClick={() => router.push("/signup")}
-              className="text-yellow-400"
+              className="text-blue-500"
             >
               Créer un compte
             </Button>
