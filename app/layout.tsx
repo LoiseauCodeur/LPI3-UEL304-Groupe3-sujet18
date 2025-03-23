@@ -22,15 +22,13 @@ const geistMono = Geist_Mono({
 
 export default function RootLayout({
   children,
-  session,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-  session?: any;
-}>) {
+}) {
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <SessionProviderWrapper session={session}>
+        <SessionProviderWrapper>
           <Header />
           {children}
           <Toaster position="top-right" reverseOrder={false} />
