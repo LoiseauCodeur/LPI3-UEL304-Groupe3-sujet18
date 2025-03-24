@@ -14,12 +14,15 @@ const Login = () => {
 
   useEffect(() => {
     const fetchCsrf = async () => {
-      const token = await getCsrfToken(); 
+      const token = await getCsrfToken();
+      if (!token) {
+        message.error("Impossible de récupérer le CSRF token");
+      }
       setCsrf(token || null);
     };
-
     fetchCsrf();
   }, []);
+  
 
   const onFinish = async (values: any) => {
     setLoading(true);
@@ -30,6 +33,11 @@ const Login = () => {
       csrfToken: csrf, 
       redirect: false,
     });
+
+    console.log("Response:", res);
+    if (!res?.ok) {
+      message.error(res?.error || "Échec de la connexion");
+    }
 
     if (res?.ok) {
       const session = await fetch("/api/auth/session").then(res => res.json());

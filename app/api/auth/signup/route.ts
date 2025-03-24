@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import mongoose from "mongoose";
 import User from "@/models/User";
+import bcrypt from "bcryptjs";
 
 async function connectToDatabase() {
   if (!mongoose.connection.readyState) {
@@ -30,7 +31,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "L'utilisateur existe déjà" }, { status: 409 });
     }
 
-    const newUser = new User({ email, username, password });
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newUser = new User({ email, username, password: hashedPassword });
     await newUser.save();
 
     return NextResponse.json({ message: "Utilisateur créé avec succès" }, { status: 201 });
