@@ -20,15 +20,12 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <SessionProviderWrapper>
+          <AutoLogout />
           <Header />
           {children}
           <Toaster position="top-right" reverseOrder={false} />
@@ -83,4 +80,37 @@ function Header() {
       )}
     </div>
   );
+}
+
+function AutoLogout() {
+  const { data: session } = useSession();
+
+  useEffect(() => {
+    if (!session) return;
+
+    let timeout: NodeJS.Timeout;
+
+    const resetTimeout = () => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        signOut();
+        console.log("Déconnexion automatique après 15 minutes d'inactivité.");
+      }, 900000); // 15 mins
+    };
+
+    window.addEventListener("mousemove", resetTimeout);
+    window.addEventListener("keydown", resetTimeout);
+    window.addEventListener("click", resetTimeout);
+
+    resetTimeout(); 
+
+    return () => {
+      clearTimeout(timeout);
+      window.removeEventListener("mousemove", resetTimeout);
+      window.removeEventListener("keydown", resetTimeout);
+      window.removeEventListener("click", resetTimeout);
+    };
+  }, [session]);
+
+  return null;
 }

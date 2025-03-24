@@ -14,22 +14,26 @@ const Signup = () => {
 
   const onFinish = async (values: any) => {
     setLoading(true);
-
+  
     try {
       const response = await fetch("/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(values),
       });
-
+  
       const data = await response.json();
-
+  
       if (!response.ok) {
-        toast.error(data.error || "Une erreur est survenue !");
+        if (response.status === 409) {
+          toast.error("Cet utilisateur existe déjà. Veuillez vous connecter.");
+        } else {
+          toast.error(data.error || "Une erreur est survenue !");
+        }
         setLoading(false);
         return;
       }
-
+  
       toast.success("Inscription réussie ! Redirection...");
       router.push("/login");
     } catch (error) {
@@ -39,6 +43,7 @@ const Signup = () => {
       setLoading(false);
     }
   };
+  
 
   return (
     <div className="flex justify-center items-center md-mt-36">
